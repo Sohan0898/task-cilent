@@ -5,7 +5,6 @@ import { TbLogout2 } from "react-icons/tb";
 import { AiOutlineBars } from "react-icons/ai";
 import { FcStatistics } from "react-icons/fc";
 import { FaTasks } from "react-icons/fa";
-import { LuClipboardEdit } from "react-icons/lu";
 import MenuItem from "./MenuItem";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -25,7 +24,6 @@ const Sidebar = () => {
     toast.success(`Logout successfully`);
     navigate("/");
   };
-
   return (
     <>
       <div className="bg-second/30 text-gray-800 flex justify-between md:hidden">
@@ -91,11 +89,7 @@ const Sidebar = () => {
                 label="Add Task"
                 address="/dashboard/addtask"
               />
-              <MenuItem
-                icon={LuClipboardEdit}
-                label="Manage Task"
-                address="/dashboard/managetask"
-              />
+              
             </nav>
           </div>
         </div>

@@ -3,14 +3,14 @@ import Container from "../Container/Container";
 const Footer = () => {
   return (
     <div>
-      <section className="py-12 bg-[#3F77C4]">
+      <section className="py-12 bg-second">
         <Container>
           <div className="">
             <div className="text-center xl:flex xl:items-center xl:justify-between xl:text-left">
               <div className="xl:flex xl:items-center xl:justify-start">
                 <img
-                  className="w-48"
-                  src="https://i.ibb.co/cF3RjJ6/Task-Optima-300-x-200-px-400-x-100-px-1.png"
+                  className="w-52"
+                  src="https://i.ibb.co/80RtchJ/Task-Optima-300-x-200-px-400-x-100-px-4.png"
                   alt=""
                 />
               </div>

@@ -7,12 +7,14 @@ import Dashboard from "../../Layout/Dashboard/Dashboard";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
 import TaskStatus from "../../Components/DashboardContent/TaskStatus";
 import AddTask from "../../Components/DashboardContent/AddTask";
+import UpdateTask from "../../Components/DashboardContent/UpdateTask";
+import ErrorPage from "../../Pages/Error/ErrorPage";
 
 const Routes = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    //   errorElement: <ErrorPage />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
@@ -39,11 +41,29 @@ const Routes = createBrowserRouter([
     children: [
       {
         path: "taskstatus",
-        element: <TaskStatus></TaskStatus>,
+        element: (
+          <PrivateRoute>
+            <TaskStatus></TaskStatus>
+          </PrivateRoute>
+        ),
       },
       {
         path: "addtask",
-        element: <AddTask></AddTask>,
+        element: (
+          <PrivateRoute>
+            <AddTask></AddTask>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "updatetask/:id",
+        element: (
+          <PrivateRoute>
+            <UpdateTask></UpdateTask>
+          </PrivateRoute>
+        ),
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/tasks/${params.id}`),
       },
     ],
   },

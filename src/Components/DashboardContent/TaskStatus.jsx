@@ -1,11 +1,32 @@
-import { useContext } from "react";
-import { AuthContext } from "../../AuthProvider/AuthProvider";
 import Todo from "./Todo";
 import Ongoing from "./Ongoing";
 import Completed from "./Completed";
+import useAuth from "../../Hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const TaskStatus = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useAuth();
+
+  const { data: items = [], refetch } = useQuery({
+    queryKey: ["contests", user?.email],
+    queryFn: async () => {
+      const res = await axios.get(
+        `http://localhost:5000/tasks?email=${user?.email}`
+      );
+      console.log(res.data);
+      return res.data;
+    },
+  });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center w-2/5 mx-auto h-[100vh]">
+        <p>wait........</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-2 px-2 lg:mt-4 lg:px-4">
       <div>
@@ -15,19 +36,21 @@ const TaskStatus = () => {
       </div>
       <div className="mt-6 px-6 py-4 rounded">
         <div className=" grid grid-cols-1 lg:grid-cols-3 justify-center gap-10 ">
-          <div className=" p-6 rounded shadow-md">
+          <div className=" p-6 rounded bg-second/10 shadow-md">
             <p className="text-2xl uppercase mb-4 text-second font-bold">
-              To-Do List :
+              To-Do List : {items?.length}
             </p>
-            <Todo></Todo>
+            {items?.map((task) => (
+              <Todo key={task._id} task={task} refetch={refetch}></Todo>
+            ))}
           </div>
-          <div className=" p-6 rounded shadow-md">
+          <div className=" p-6 rounded bg-red-100 shadow-md">
             <p className="text-2xl uppercase mb-4 text-red-500 font-bold">
               Ongoing :
             </p>
             <Ongoing></Ongoing>
           </div>
-          <div className=" p-6 rounded shadow-md">
+          <div className=" p-6 rounded bg-green-100 shadow-md">
             <p className="text-2xl uppercase mb-4 text-green-500 font-bold">
               Completed :
             </p>

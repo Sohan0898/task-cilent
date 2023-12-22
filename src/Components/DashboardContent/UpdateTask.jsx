@@ -1,35 +1,37 @@
 import { useForm } from "react-hook-form";
 
 import toast from "react-hot-toast";
-import useAuth from "../../Hooks/useAuth";
-import axios from "axios";
 
-const AddTask = () => {
-  const { user } = useAuth();
+import axios from "axios";
+import { useLoaderData } from "react-router-dom";
+
+const UpdateTask = () => {
+  const { title, description, prioritys, deadline, _id } = useLoaderData();
+
   const { register, handleSubmit, setValue, watch, reset } = useForm();
 
-  const onSubmit = async (data) => {
+  const updatedTask = async (data) => {
     try {
       const taskInfo = {
-        email: user?.email,
         title: data.title,
         prioritys: data.priority,
         description: data.description,
         deadline: data.deadline,
       };
+
       console.log("taskinfo", taskInfo);
-      const response = await axios.post(
-        "http://localhost:5000/tasks",
+      const response = await axios.patch(
+        `http://localhost:5000/tasks/${_id}`,
         taskInfo
       );
       console.log(response.data);
-      if (response.data.insertedId) {
+      if (response.data.modifiedCount > 0) {
+        toast.success("Task updated successfully!");
         reset();
-        toast.success("Task added successfully!");
       }
     } catch (error) {
-      console.error("Error adding task:", error);
-      toast.error("Error adding task. Please try again.");
+      console.error("Error updating task:", error);
+      toast.error("Error updating task. Please try again.");
     }
   };
 
@@ -44,14 +46,14 @@ const AddTask = () => {
       <section className="">
         <div>
           <p className="text-xl md:text-2xl lg:text-4xl font-medium">
-            Add Your Task :{" "}
+            Update {title} :{" "}
           </p>
         </div>
         <div className="w-full py-8">
           <div className="grid grid-cols-1 gap-x-16 gap-y-8 lg:grid-cols-5">
             <div className="rounded-lg bg-gray-200 p-8 shadow-lg lg:col-span-5 lg:p-12">
               <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(updatedTask)}
                 className="space-y-4 lg:space-y-8"
               >
                 <div>
@@ -59,11 +61,12 @@ const AddTask = () => {
                     Title
                   </label>
                   <input
-                    {...register("title", { required: true })}
-                    className="w-full outline-second rounded-lg border-gray-200 p-5 text-sm"
+                    {...register("title", { required: false })}
+                    className="w-full outline-first rounded-lg border-gray-200 p-5 text-sm"
                     placeholder="Enter Task Title"
                     type="text"
                     id="title"
+                    defaultValue={title}
                   />
                 </div>
                 <div>
@@ -71,16 +74,28 @@ const AddTask = () => {
                     DeadLine
                   </label>
                   <input
-                    {...register("deadline", { required: true })}
-                    className="w-full outline-second placeholder-gray-300 rounded-lg border-gray-200 p-5 text-sm"
+                    {...register("deadline", { required: false })}
+                    className="w-full outline-first placeholder-gray-300 rounded-lg border-gray-200 p-5 text-sm"
                     type="date"
+                    defaultValue={deadline}
+                  />
+                </div>
+                <div>
+                  <label className="sr-only" htmlFor="priority">
+                    Priority
+                  </label>
+                  <input
+                    className="w-full outline-first placeholder-gray-300 rounded-lg border-gray-200 p-5 text-sm"
+                    type="text"
+                    defaultValue={prioritys}
+                    readOnly
                   />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
                   <div>
                     <input
-                      {...register("priority", { required: true })}
+                      {...register("priority", { required: false })}
                       className="peer sr-only"
                       id="option1"
                       type="radio"
@@ -92,9 +107,9 @@ const AddTask = () => {
 
                     <label
                       htmlFor="option1"
-                      className={`block w-full rounded-lg bg-white border-2 border-second p-5 text-gray-700  hover:bg-second ${
+                      className={`block w-full rounded-lg bg-white border-2 border-first p-5 text-gray-700  hover:bg-first ${
                         priority === "Low"
-                          ? "border-second bg-second text-white"
+                          ? "border-first bg-second text-white"
                           : ""
                       }`}
                       tabIndex="0"
@@ -105,7 +120,7 @@ const AddTask = () => {
 
                   <div>
                     <input
-                      {...register("priority", { required: true })}
+                      {...register("priority", { required: false })}
                       className="peer sr-only"
                       id="option2"
                       type="radio"
@@ -117,9 +132,9 @@ const AddTask = () => {
 
                     <label
                       htmlFor="option2"
-                      className={`block w-full rounded-lg bg-white border-2 border-second p-5 text-gray-700  hover:bg-second ${
+                      className={`block w-full rounded-lg bg-white border-2 border-first p-5 text-gray-700  hover:bg-first ${
                         priority === "Moderate"
-                          ? "border-second bg-second text-white"
+                          ? "border-first bg-second text-white"
                           : ""
                       }`}
                       tabIndex="0"
@@ -130,7 +145,7 @@ const AddTask = () => {
 
                   <div>
                     <input
-                      {...register("priority", { required: true })}
+                      {...register("priority", { required: false })}
                       className="peer sr-only"
                       id="option3"
                       type="radio"
@@ -142,9 +157,9 @@ const AddTask = () => {
 
                     <label
                       htmlFor="option3"
-                      className={`block w-full rounded-lg bg-white border-2 border-second p-5 text-gray-700  hover:bg-second ${
+                      className={`block w-full rounded-lg bg-white border-2 border-first p-5 text-gray-700  hover:bg-first ${
                         priority === "High"
-                          ? "border-second bg-second text-white"
+                          ? "border-first bg-second text-white"
                           : ""
                       }`}
                       tabIndex="0"
@@ -160,20 +175,21 @@ const AddTask = () => {
                   </label>
 
                   <textarea
-                    {...register("description", { required: true })}
-                    className="w-full outline-second rounded-lg border-gray-200 p-3 text-sm"
+                    {...register("description", { required: false })}
+                    className="w-full outline-first rounded-lg border-gray-200 p-3 text-sm"
                     placeholder="Task Description..."
                     rows="6"
                     id="description"
+                    defaultValue={description}
                   ></textarea>
                 </div>
 
                 <div className="mt-4">
                   <button
                     type="submit"
-                    className="inline-block w-full rounded-lg bg-second hover:bg-first px-5 py-5 font-medium text-white"
+                    className="inline-block w-full rounded-lg bg-first hover:bg-second px-5 py-5 font-medium text-white"
                   >
-                    Add New Task
+                    Update Task
                   </button>
                 </div>
               </form>
@@ -185,4 +201,4 @@ const AddTask = () => {
   );
 };
 
-export default AddTask;
+export default UpdateTask;
